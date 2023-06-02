@@ -4,7 +4,7 @@ pragma solidity >=0.8.2 <0.9.0;
 
 contract CrowdFunding{
 
-    mapping(address=>uint) public contributor; //contributor address and his amount
+    mapping(address=>uint) public contributor; //contributor address => amount
     address public manager;
     uint public minContribution;
     uint public deadline;
@@ -12,9 +12,9 @@ contract CrowdFunding{
     uint public raisedAmount;
     uint public noOfContibutors;
 
-    struct Request{
-        string description;
-        address payable recipient;
+    struct Request{        //request by a organization asking money
+        string description;  //name of organization
+        address payable recipient; //address of the organization owner
         uint value;
         bool completed;
         uint noOfVoters;
@@ -70,6 +70,11 @@ contract CrowdFunding{
         newRequest.completed=false;
     }
 
+    function requestsInfo(uint request_no) public view returns(string memory,uint){
+        Request storage checkRequest = requests[request_no];
+        return(checkRequest.description,checkRequest.value);
+    }
+
     function voteRequest(uint request_no) public{
         require(contributor[msg.sender] > 0,"You must me a contributor");
         Request storage thisRequest = requests[request_no];
@@ -83,7 +88,7 @@ contract CrowdFunding{
         Request storage thisRequest = requests[request_no];
         require(thisRequest.completed == false,"The request has already been made");
         require(thisRequest.noOfVoters > noOfContibutors/2,"No majority");
-        thisRequest.recipient.transfer(thisRequest.value);
+        thisRequest.recipient.transfer(thisRequest.value);//transfer the money to the recipient address
         thisRequest.completed = true;
     }
 }
